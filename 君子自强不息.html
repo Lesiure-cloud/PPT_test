@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>君子自强不息</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap">
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Paper & Ink - 文学编辑风格
+           =========================================== */
+        :root {
+            /* Colors */
+            --bg-cream: #faf9f7;
+            --bg-paper: #f5f3ee;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555;
+            --accent-crimson: #c41e3a;
+            --accent-gold: #c9b896;
+            --accent-ink: #2c2c2c;
+
+            /* Typography */
+            --font-display: 'Noto Serif SC', serif;
+            --font-body: 'Noto Sans SC', sans-serif;
+            --title-size: clamp(1.8rem, 5vw, 3.5rem);
+            --h2-size: clamp(1.3rem, 3.5vw, 2.2rem);
+            --h3-size: clamp(1rem, 2.5vw, 1.5rem);
+            --body-size: clamp(0.85rem, 1.5vw, 1.1rem);
+            --small-size: clamp(0.75rem, 1.2vw, 0.95rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(1rem, 2vw, 2rem);
+            --element-gap: clamp(0.5rem, 1vw, 1rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           VIEWPORT FITTING: MANDATORY BASE STYLES
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            font-family: var(--font-body);
+            background: var(--bg-cream);
+            color: var(--text-primary);
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--bg-paper);
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+            max-width: min(90vw, 1100px);
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1, h2, h3 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        h1 { font-size: var(--title-size); }
+        h2 { font-size: var(--h2-size); }
+        h3 { font-size: var(--h3-size); }
+
+        p, li {
+            font-size: var(--body-size);
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .reveal:nth-child(6) { transition-delay: 0.6s; }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent-crimson);
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+
+        /* ===========================================
+           NAVIGATION DOTS
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--accent-crimson);
+            transform: scale(1.3);
+        }
+
+        /* ===========================================
+           DECORATIVE ELEMENTS
+           =========================================== */
+        .ink-accent {
+            width: 60px;
+            height: 3px;
+            background: var(--accent-crimson);
+            margin: 1rem 0;
+        }
+
+        .drop-cap {
+            float: left;
+            font-family: var(--font-display);
+            font-size: 4rem;
+            line-height: 1;
+            padding-right: 0.5rem;
+            color: var(--accent-crimson);
+            font-weight: 700;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+            margin: 1.5rem 0;
+        }
+
+        .quote-mark {
+            font-family: var(--font-display);
+            font-size: 5rem;
+            color: var(--accent-gold);
+            line-height: 0.5;
+            opacity: 0.5;
+        }
+
+        /* ===========================================
+           SLIDE SPECIFIC STYLES
+           =========================================== */
+
+        /* Title Slide */
+        .title-slide {
+            background: linear-gradient(135deg, var(--bg-cream) 0%, var(--bg-paper) 100%);
+        }
+
+        .title-slide .slide-content {
+            align-items: center;
+            text-align: center;
+        }
+
+        .title-slide h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .title-slide .subtitle {
+            font-size: var(--h3-size);
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 0.15em;
+        }
+
+        .title-decoration {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: var(--accent-crimson);
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: rgba(255,255,255,0.7);
+            border-left: 4px solid var(--accent-crimson);
+            padding: 1.5rem 2rem;
+            margin: 0.75rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .content-card h3 {
+            color: var(--accent-crimson);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Quote Card */
+        .quote-card {
+            background: var(--bg-cream);
+            padding: 2rem;
+            border-radius: 4px;
+            position: relative;
+            margin: 1rem 0;
+        }
+
+        .quote-card::before {
+            content: '"';
+            position: absolute;
+            top: 0.5rem;
+            left: 1rem;
+            font-family: var(--font-display);
+            font-size: 4rem;
+            color: var(--accent-gold);
+            opacity: 0.5;
+        }
+
+        .quote-card p {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-style: italic;
+            padding-left: 2rem;
+            color: var(--text-primary);
+        }
+
+        .quote-card .attribution {
+            text-align: right;
+            margin-top: 1rem;
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent-gold);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: calc(-2rem - 4px);
+            top: 1.2rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-crimson);
+        }
+
+        .timeline-item .year {
+            font-weight: 600;
+            color: var(--accent-crimson);
+            font-size: var(--small-size);
+        }
+
+        /* Grid Layout */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-item {
+            background: rgba(255,255,255,0.6);
+            padding: 1.25rem;
+            border-radius: 4px;
+            border-top: 3px solid var(--accent-gold);
+        }
+
+        .feature-item h4 {
+            font-family: var(--font-display);
+            color: var(--accent-crimson);
+            margin-bottom: 0.5rem;
+            font-size: var(--body-size);
+        }
+
+        /* List Styles */
+        .styled-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .styled-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .styled-list li::before {
+            content: '◆';
+            position: absolute;
+            left: 0;
+            color: var(--accent-crimson);
+            font-size: 0.6rem;
+            top: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(1rem, 3vw, 2rem);
+                --content-gap: clamp(0.75rem, 1.5vw, 1rem);
+            }
+            .content-card { padding: 1rem 1.5rem; }
+            .quote-card { padding: 1.5rem; }
+        }
+
+        @media (max-height: 600px) {
+            .nav-dots { display: none; }
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation Dots -->
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- Slide 1: Title -->
+    <section class="slide title-slide">
+        <div class="slide-content">
+            <h1 class="reveal">君子自强不息</h1>
+            <p class="subtitle reveal">The Gentleman Strives tirelessly to Strengthen Himself</p>
+            <div class="ink-accent reveal" style="margin-top: 2rem;"></div>
+        </div>
+        <div class="title-decoration"></div>
+    </section>
+
+    <!-- Slide 2: Introduction -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">自强不息的精神内涵</h2>
+            <div class="ink-accent reveal"></div>
+            <p class="reveal" style="font-size: var(--h3-size); color: var(--text-primary); margin-bottom: 1rem;">
+                "天行健，君子以自强不息；地势坤，君子以厚德载物。"
+            </p>
+            <p class="reveal">——《易经》</p>
+            <div class="divider reveal"></div>
+            <div class="feature-grid reveal">
+                <div class="feature-item">
+                    <h4>发愤图强</h4>
+                    <p>开拓进取，永不停息</p>
+                </div>
+                <div class="feature-item">
+                    <h4>坚韧不拔</h4>
+                    <p>面对挫折百折不挠</p>
+                </div>
+                <div class="feature-item">
+                    <h4>自信自强</h4>
+                    <p>对自己充满信心</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 3: Mythology -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">神话传说中的自强精神</h2>
+            <div class="ink-accent reveal"></div>
+            <div class="feature-grid reveal">
+                <div class="content-card">
+                    <h3>大禹治水</h3>
+                    <p>三过家门而不入，历经十三年治理洪水，体现了不屈不挠的奋斗精神。</p>
+                </div>
+                <div class="content-card">
+                    <h3>夸父逐日</h3>
+                    <p>追逐太阳，道渴而死，杖化邓林，展现了人类挑战极限的勇气。</p>
+                </div>
+                <div class="content-card">
+                    <h3>精卫填海</h3>
+                    <p>炎帝之女溺亡后化为精卫鸟，衔木石以填东海，象征着永不放弃的意志。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 4: Classical Poetry -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">古典诗文中的自强</h2>
+            <div class="ink-accent reveal"></div>
+            <div class="quote-card reveal">
+                <p>发愤忘食，乐以忘忧，不知老之将至。</p>
+                <div class="attribution">——《论语》</div>
+            </div>
+            <div class="quote-card reveal">
+                <p>天生我材必有用。</p>
+                <div class="attribution">——李白《将进酒》</div>
+            </div>
+            <div class="quote-card reveal">
+                <p>路漫漫其修远兮，吾将上下而求索。</p>
+                <div class="attribution">——屈原《离骚》</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 5: Famous Quotes -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">名人名言</h2>
+            <div class="ink-accent reveal"></div>
+            <div class="content-card reveal">
+                <p>"不要容自己昏睡！趁您还年轻力壮，血气方刚，要永不停歇地做好事情。"</p>
+                <p style="text-align: right; margin-top: 0.5rem; font-style: italic;">—— 契诃夫</p>
+            </div>
+            <div class="content-card reveal">
+                <p>"别人后退，我不退；别人前进，我更进。要攀登这座山的人，起初在下部是艰难的，越上升越没有痛苦。"</p>
+                <p style="text-align: right; margin-top: 0.5rem; font-style: italic;">—— 但丁</p>
+            </div>
+            <div class="content-card reveal">
+                <p>"第一个青春是上帝给的；第二个青春是靠自己努力的。"</p>
+                <p style="text-align: right; margin-top: 0.5rem; font-style: italic;">—— 李嘉诚</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 6: Gou Jian -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">勾践：卧薪尝胆</h2>
+            <div class="ink-accent reveal"></div>
+            <p class="reveal">越王勾践被吴王夫差打败后，忍辱负重，卧薪尝胆，最终灭吴雪耻。</p>
+            <div class="divider reveal"></div>
+            <ul class="styled-list reveal">
+                <li>在屋里挂苦胆，每顿饭都要尝尝苦味，提醒自己不忘耻辱</li>
+                <li>身着粗布，顿顿粝食，与百姓一起耕田播种</li>
+                <li>收购吴国粮食，赠送木料耗费其人力物力</li>
+                <li>散布谣言离间吴国君臣，施用美人计消磨夫差精力</li>
+                <li>出台促进人口增加的法令，发展生产与军队战斗力</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 7: Beethoven -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">贝多芬：扼住命运的咽喉</h2>
+            <div class="ink-accent reveal"></div>
+            <div class="quote-card reveal">
+                <p>我要扼住命运的咽喉。</p>
+                <div class="attribution">—— 贝多芬</div>
+            </div>
+            <p class="reveal">德国音乐家贝多芬在失去聆听能力后，用《命运》之曲谱写了自己生命的辉煌，用不屈于命运的方式让全世界人看见了他的身影。</p>
+            <div class="divider reveal"></div>
+            <p class="reveal" style="font-style: italic; color: var(--accent-crimson);">即使身处逆境，也要用意志战胜命运，创造属于自己的辉煌。</p>
+        </div>
+    </section>
+
+    <!-- Slide 8: Sun Yat-sen -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">孙中山：一生奋斗于革命</h2>
+            <div class="ink-accent reveal"></div>
+            <div class="timeline reveal">
+                <div class="timeline-item">
+                    <span class="year">1894年</span>
+                    <p>在美国檀香山成立兴中会</p>
+                </div>
+                <div class="timeline-item">
+                    <span class="year">1905年</span>
+                    <p>在日本成立中国同盟会，阐发三民主义</p>
+                </div>
+                <div class="timeline-item">
+                    <span class="year">1911年</span>
+                    <p>发动辛亥革命，推翻清王朝</p>
+                </div>
+                <div class="timeline-item">
+                    <span class="year">1912年</span>
+                    <p>成立中华民国，就任临时大总统</p>
+                </div>
+                <div class="timeline-item">
+                    <span class="year">1924年</span>
+                    <p>主持国民党一大，实现国共合作</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 9: Zhou Enlai -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">周恩来：今日事今日毕</h2>
+            <div class="ink-accent reveal"></div>
+            <p class="reveal">周恩来五岁时开始学写毛笔字，给自己立了一条规矩：每天完成功课后，还要练习写一百个毛笔字。</p>
+            <div class="quote-card reveal">
+                <p>不，今天的事情今天做，明天还有明天的事！</p>
+                <div class="attribution">—— 少年周恩来</div>
+            </div>
+            <p class="reveal">有一次外出串亲戚，回来天色已晚，蒋妈妈劝他明天再补，但小恩来坚持完成当天的任务才肯睡觉。</p>
+            <div class="divider reveal"></div>
+            <p class="reveal" style="text-align: center; color: var(--accent-crimson); font-weight: 500;">活在当下，今日事今日毕</p>
+        </div>
+    </section>
+
+    <!-- Slide 10: Modern Interpretation -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">古今风韵展自强</h2>
+            <div class="ink-accent reveal"></div>
+            <div class="feature-grid reveal">
+                <div class="feature-item">
+                    <h4>目标导向</h4>
+                    <p>为达成目标不停努力，寻找任何方法</p>
+                </div>
+                <div class="feature-item">
+                    <h4>活在当下</h4>
+                    <p>今日事今日毕，做好每一天</p>
+                </div>
+                <div class="feature-item">
+                    <h4>坚韧不拔</h4>
+                    <p>面对挫折不被击倒，百折不挠</p>
+                </div>
+                <div class="feature-item">
+                    <h4>自信自强</h4>
+                    <p>对自己有信心，相信天生我材必有用</p>
+                </div>
+            </div>
+            <div class="divider reveal"></div>
+            <p class="reveal" style="text-align: center; font-size: var(--h3-size); color: var(--text-primary);">
+                发愤图强，开拓进取，永不停息
+            </p>
+        </div>
+    </section>
+
+    <!-- Slide 11: Closing -->
+    <section class="slide title-slide">
+        <div class="slide-content">
+            <h2 class="reveal" style="font-size: var(--title-size);">谢谢观看</h2>
+            <div class="ink-accent reveal"></div>
+            <p class="reveal" style="font-size: var(--h3-size);">君子以自强不息</p>
+            <p class="reveal" style="margin-top: 2rem; font-size: var(--body-size);">
+                愿我们都能传承这份精神，在各自的领域奋发图强
+            </p>
+        </div>
+    </section>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.isScrolling = false;
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupProgressBar();
+                this.setupNavDots();
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = Array.from(this.slides).indexOf(entry.target);
+                            this.updateProgressBar();
+                            this.updateNavDots();
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        this.prevSlide();
+                    } else if (e.key === 'Home') {
+                        e.preventDefault();
+                        this.goToSlide(0);
+                    } else if (e.key === 'End') {
+                        e.preventDefault();
+                        this.goToSlide(this.slides.length - 1);
+                    }
+                });
+            }
+
+            setupTouchNav() {
+                let touchStartY = 0;
+                let touchEndY = 0;
+
+                document.addEventListener('touchstart', (e) => {
+                    touchStartY = e.changedTouches[0].screenY;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    touchEndY = e.changedTouches[0].screenY;
+                    this.handleSwipe(touchStartY, touchEndY);
+                }, { passive: true });
+            }
+
+            handleSwipe(startY, endY) {
+                const threshold = 50;
+                if (startY - endY > threshold) {
+                    this.nextSlide();
+                } else if (endY - startY > threshold) {
+                    this.prevSlide();
+                }
+            }
+
+            setupProgressBar() {
+                this.updateProgressBar();
+            }
+
+            updateProgressBar() {
+                const progress = ((this.currentSlide + 1) / this.slides.length) * 100;
+                document.getElementById('progressBar').style.width = progress + '%';
+            }
+
+            setupNavDots() {
+                const navDots = document.getElementById('navDots');
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot';
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    navDots.appendChild(dot);
+                });
+                this.updateNavDots();
+            }
+
+            updateNavDots() {
+                const dots = document.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.slides.length - 1) {
+                    this.goToSlide(this.currentSlide + 1);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.goToSlide(this.currentSlide - 1);
+                }
+            }
+
+            goToSlide(index) {
+                this.slides[index].scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        new SlidePresentation();
+    </script>
+</body>
+</html>
